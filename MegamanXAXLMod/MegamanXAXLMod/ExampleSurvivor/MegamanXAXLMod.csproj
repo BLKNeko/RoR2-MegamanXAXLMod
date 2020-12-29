@@ -1,0 +1,90 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="megamanxaxlmodbundle" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="megamanxaxlmodbundle" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\BepInEx\core\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp.R2API.mm">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\BepInEx\plugins\tristanmcpherson-R2API-2.5.14\monomod\Assembly-CSharp.R2API.mm.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\BepInEx\core\BepInEx.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.Harmony">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\BepInEx\core\BepInEx.Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.MonoMod.Loader">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\BepInEx\patchers\BepInEx.MonoMod.Loader\BepInEx.MonoMod.Loader.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.Preloader">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\BepInEx\core\BepInEx.Preloader.dll</HintPath>
+    </Reference>
+    <Reference Include="MMHOOK_Assembly-CSharp">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\BepInEx\plugins\tristanmcpherson-R2API-2.5.14\plugins\R2API\MMHOOK_Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\BepInEx\core\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\BepInEx\core\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\BepInEx\patchers\BepInEx.MonoMod.Loader\MonoMod.exe</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.RuntimeDetour">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.Utils">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\BepInEx\core\MonoMod.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="R2API">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\BepInEx\plugins\tristanmcpherson-R2API-2.5.14\plugins\R2API\R2API.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>..\..\..\..\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>..\..\..\..\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>..\..\..\..\MegamanXMod\MegamanXMod\MegamanXMod\ExampleSurvivor\bin\Debug\netstandard2.0\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.DirectorModule">
+      <HintPath>..\..\..\..\UnityEngine.DirectorModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Networking">
+      <HintPath>..\..\..\..\..\..\..\GAMES\Risk Of Rain 2\Risk of Rain 2 [BuildID 5745074] (Windows)\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.Networking.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>..\..\..\..\UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>..\..\..\..\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Wwise">
+      <HintPath>..\..\..\..\MegamanXMod\MegamanXMod\MegamanXMod\ExampleSurvivor\bin\Debug\netstandard2.0\Wwise.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
