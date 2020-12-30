@@ -93,3 +93,4 @@ C:\JOGOS\Tools\ROR2 ModdingTools\MegamanXAXLMod\MegamanXAXLMod\MegamanXAXLMod\Ex
 C:\JOGOS\Tools\ROR2 ModdingTools\MegamanXAXLMod\MegamanXAXLMod\MegamanXAXLMod\ExampleSurvivor\obj\Debug\netstandard2.0\MegamanXAXLMod.csproj.CopyComplete
 C:\JOGOS\Tools\ROR2 ModdingTools\MegamanXAXLMod\MegamanXAXLMod\MegamanXAXLMod\ExampleSurvivor\obj\Debug\netstandard2.0\MegamanXAXLMod.dll
 C:\JOGOS\Tools\ROR2 ModdingTools\MegamanXAXLMod\MegamanXAXLMod\MegamanXAXLMod\ExampleSurvivor\obj\Debug\netstandard2.0\MegamanXAXLMod.pdb
+C:\JOGOS\Tools\ROR2 ModdingTools\MegamanXAXLMod\MegamanXAXLMod\MegamanXAXLMod\ExampleSurvivor\obj\Debug\netstandard2.0\MegamanXAXLMod.csprojAssemblyReference.cache
