@@ -5,10 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="AXLSB.bnk" />
     <None Remove="megamanxaxlmodbundle" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="AXLSB.bnk" />
     <EmbeddedResource Include="megamanxaxlmodbundle" />
   </ItemGroup>
 

@@ -1,0 +1,24 @@
+Event	ID	Name			Wwise Object Path	Notes
+	184542305	CallAXLBullets			\Default Work Unit\CallAXLBullets	
+	2713733870	CallAXLAttack			\Default Work Unit\CallAXLAttack	
+	2926227248	CallAXLRayGun			\Default Work Unit\CallAXLRayGun	
+	3042042192	CallAXLDie			\Default Work Unit\CallAXLDie	
+	3321447026	CallAXLDash			\Default Work Unit\CallAXLDash	
+	3333499765	CallBlastLauncher			\Default Work Unit\CallBlastLauncher	
+
+Game Parameter	ID	Name			Wwise Object Path	Notes
+	3673881719	Volume_SFX			\Default Work Unit\Volume_SFX	
+	3695994288	Volume_Master			\Default Work Unit\Volume_Master	
+
+In Memory Audio	ID	Name	Audio source file		Wwise Object Path	Notes	Data Size
+	33034102	AXLTakeThis	C:\Users\augus\OneDrive\Documentos\WwiseProjects\MegamanAXLSB\.cache\Windows\SFX\AXLTakeThis_A1793BE9.wem		\Actor-Mixer Hierarchy\Default Work Unit\MasterMixer\SFXMixer\SFX\AXLAttack\AXLTakeThis		9513
+	50159237	AXLAHA	C:\Users\augus\OneDrive\Documentos\WwiseProjects\MegamanAXLSB\.cache\Windows\SFX\AXLAHA_A1793BE9.wem		\Actor-Mixer Hierarchy\Default Work Unit\MasterMixer\SFXMixer\SFX\AXLAttack\AXLAHA		4454
+	93320517	AXLEatThis	C:\Users\augus\OneDrive\Documentos\WwiseProjects\MegamanAXLSB\.cache\Windows\SFX\AXLEatThis_A1793BE9.wem		\Actor-Mixer Hierarchy\Default Work Unit\MasterMixer\SFXMixer\SFX\AXLAttack\AXLEatThis		10336
+	100507251	AXLBullet	C:\Users\augus\OneDrive\Documentos\WwiseProjects\MegamanAXLSB\.cache\Windows\SFX\AXLBullet_A1793BE9.wem		\Actor-Mixer Hierarchy\Default Work Unit\MasterMixer\SFXMixer\SFX\AXLBullet		3608
+	135690363	AXLHaha	C:\Users\augus\OneDrive\Documentos\WwiseProjects\MegamanAXLSB\.cache\Windows\SFX\AXLHaha_A1793BE9.wem		\Actor-Mixer Hierarchy\Default Work Unit\MasterMixer\SFXMixer\SFX\AXLAttack\AXLHaha		6056
+	182476617	AXLRayGun	C:\Users\augus\OneDrive\Documentos\WwiseProjects\MegamanAXLSB\.cache\Windows\SFX\AXLRayGun_A1793BE9.wem		\Actor-Mixer Hierarchy\Default Work Unit\MasterMixer\SFXMixer\SFX\AXLRayGun		3431
+	216380590	AXLBlastLauncher	C:\Users\augus\OneDrive\Documentos\WwiseProjects\MegamanAXLSB\.cache\Windows\SFX\AXLBlastLauncher_A1793BE9.wem		\Actor-Mixer Hierarchy\Default Work Unit\MasterMixer\SFXMixer\SFX\AXLBlastLauncher		5668
+	583813211	AXLTakeThat	C:\Users\augus\OneDrive\Documentos\WwiseProjects\MegamanAXLSB\.cache\Windows\SFX\AXLTakeThat_A1793BE9.wem		\Actor-Mixer Hierarchy\Default Work Unit\MasterMixer\SFXMixer\SFX\AXLAttack\AXLTakeThat		8668
+	756589359	AXLDie	C:\Users\augus\OneDrive\Documentos\WwiseProjects\MegamanAXLSB\.cache\Windows\SFX\AXLDie_A1793BE9.wem		\Actor-Mixer Hierarchy\Default Work Unit\MasterMixer\SFXMixer\SFX\AXLDie		33481
+	862026474	AXLDash	C:\Users\augus\OneDrive\Documentos\WwiseProjects\MegamanAXLSB\.cache\Windows\SFX\AXLDash_A1793BE9.wem		\Actor-Mixer Hierarchy\Default Work Unit\MasterMixer\SFXMixer\SFX\AXLDash		6978
+

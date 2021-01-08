@@ -12,6 +12,7 @@ using RoR2.Projectile;
 using UnityEngine;
 using UnityEngine.Networking;
 using KinematicCharacterController;
+using System.IO;
 
 namespace ExampleSurvivor
 {
@@ -30,9 +31,11 @@ namespace ExampleSurvivor
         public GameObject characterDisplay; // the prefab used for character select
         public GameObject doppelganger; // umbra shit
 
-        public static GameObject arrowProjectile; // prefab for our survivor's primary attack projectile
+        public static GameObject axlBullet; // prefab for our survivor's primary attack projectile
+        public static GameObject blastL; // prefab for our survivor's BlastLauncher attack projectile
+        public static GameObject rayG; // prefab for our survivor's RayGun attack projectile
 
-        private static readonly Color characterColor = new Color(0.55f, 0.55f, 0.55f); // color used for the survivor
+        private static readonly Color characterColor = new Color(0.10f, 0.20f, 0.44f); // color used for the survivor
 
         private void Awake()
         {
@@ -106,27 +109,27 @@ namespace ExampleSurvivor
             bodyComponent.bodyFlags = CharacterBody.BodyFlags.ImmuneToExecutes;
             bodyComponent.rootMotionInMainState = false;
             bodyComponent.mainRootSpeed = 0;
-            bodyComponent.baseMaxHealth = 90;
+            bodyComponent.baseMaxHealth = 95;
             bodyComponent.levelMaxHealth = 24;
             bodyComponent.baseRegen = 0.5f;
-            bodyComponent.levelRegen = 0.25f;
+            bodyComponent.levelRegen = 0.3f;
             bodyComponent.baseMaxShield = 0;
             bodyComponent.levelMaxShield = 0;
-            bodyComponent.baseMoveSpeed = 7;
-            bodyComponent.levelMoveSpeed = 0;
-            bodyComponent.baseAcceleration = 80;
+            bodyComponent.baseMoveSpeed = 9;
+            bodyComponent.levelMoveSpeed = 0.4f;
+            bodyComponent.baseAcceleration = 90;
             bodyComponent.baseJumpPower = 15;
-            bodyComponent.levelJumpPower = 0;
-            bodyComponent.baseDamage = 15;
-            bodyComponent.levelDamage = 3f;
-            bodyComponent.baseAttackSpeed = 1;
-            bodyComponent.levelAttackSpeed = 0;
-            bodyComponent.baseCrit = 1;
-            bodyComponent.levelCrit = 0;
+            bodyComponent.levelJumpPower = 0.30f;
+            bodyComponent.baseDamage = 15.5f;
+            bodyComponent.levelDamage = 3.5f;
+            bodyComponent.baseAttackSpeed = 1.7f;
+            bodyComponent.levelAttackSpeed = 0.3f;
+            bodyComponent.baseCrit = 1.8f;
+            bodyComponent.levelCrit = 0.45f;
             bodyComponent.baseArmor = 0;
             bodyComponent.levelArmor = 0;
             bodyComponent.baseJumpCount = 1;
-            bodyComponent.sprintingSpeedMultiplier = 1.45f;
+            bodyComponent.sprintingSpeedMultiplier = 1.55f;
             bodyComponent.wasLucky = false;
             bodyComponent.hideCrosshair = false;
             bodyComponent.aimOriginTransform = gameObject3.transform;
@@ -142,7 +145,7 @@ namespace ExampleSurvivor
             characterMotor.characterDirection = characterDirection;
             characterMotor.muteWalkMotion = false;
             characterMotor.mass = 100f;
-            characterMotor.airControl = 0.25f;
+            characterMotor.airControl = 0.55f;
             characterMotor.disableAirControlUntilCollision = false;
             characterMotor.generateParametersOnAwake = true;
             //characterMotor.useGravity = true;
@@ -219,7 +222,7 @@ namespace ExampleSurvivor
 
             // edit the sfxlocator if you want different sounds
             SfxLocator sfxLocator = characterPrefab.GetComponent<SfxLocator>();
-            sfxLocator.deathSound = "Play_ui_player_death";
+            sfxLocator.deathSound = Sounds.axlDie;
             sfxLocator.barkSound = "";
             sfxLocator.openSound = "";
             sfxLocator.landingSound = "Play_char_land";
@@ -322,35 +325,65 @@ namespace ExampleSurvivor
             characterDisplay = PrefabAPI.InstantiateClone(characterPrefab.GetComponent<ModelLocator>().modelBaseTransform.gameObject, "AxlDisplay", true, "C:\\Users\\test\\Documents\\ror2mods\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor.cs", "RegisterCharacter", 153);
             characterDisplay.AddComponent<NetworkIdentity>();
 
+            //-----------------------------------------------------------------------------------------------------------
+
             // clone rex's syringe projectile prefab here to use as our own projectile
-            arrowProjectile = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("Prefabs/Projectiles/SyringeProjectile"), "Prefabs/Projectiles/ExampleArrowProjectile", true, "C:\\Users\\test\\Documents\\ror2mods\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor.cs", "RegisterCharacter", 155);
+            axlBullet = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("prefabs/projectiles/TitanRockProjectile"), "Prefabs/Projectiles/ExampleArrowProjectile", true, "C:\\Users\\test\\Documents\\ror2mods\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor.cs", "RegisterCharacter", 155);
 
             // just setting the numbers to 1 as the entitystate will take care of those
-            arrowProjectile.GetComponent<ProjectileController>().procCoefficient = 1f;
-            arrowProjectile.GetComponent<ProjectileDamage>().damage = 1f;
-            arrowProjectile.GetComponent<ProjectileDamage>().damageType = DamageType.Generic;
+            axlBullet.GetComponent<ProjectileController>().procCoefficient = 1f;
+            axlBullet.GetComponent<ProjectileDamage>().damage = 1f;
+            axlBullet.GetComponent<ProjectileDamage>().damageType = DamageType.Generic;
 
             // register it for networking
-            if (arrowProjectile) PrefabAPI.RegisterNetworkPrefab(arrowProjectile);
+            if (axlBullet) PrefabAPI.RegisterNetworkPrefab(axlBullet);
+
+            //-------------------------------------------------------------------------------------------------------------
+
+            // clone rex's syringe projectile prefab here to use as our own projectile
+            blastL = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("prefabs/projectiles/EngiGrenadeProjectile"), "Prefabs/Projectiles/blastLProjectile", true, "C:\\Users\\test\\Documents\\ror2mods\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor.cs", "RegisterCharacter", 155);
+
+            // just setting the numbers to 1 as the entitystate will take care of those
+            blastL.GetComponent<ProjectileController>().procCoefficient = 1f;
+            blastL.GetComponent<ProjectileDamage>().damage = 1f;
+            blastL.GetComponent<ProjectileDamage>().damageType = DamageType.Generic;
+
+            // register it for networking
+            if (blastL) PrefabAPI.RegisterNetworkPrefab(blastL);
+
+            //-------------------------------------------------------------------------------------------------------------
+
+            // clone rex's syringe projectile prefab here to use as our own projectile
+            rayG = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("prefabs/projectiles/Arrow"), "Prefabs/Projectiles/blastLProjectile", true, "C:\\Users\\test\\Documents\\ror2mods\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor.cs", "RegisterCharacter", 155);
+
+            // just setting the numbers to 1 as the entitystate will take care of those
+            rayG.GetComponent<ProjectileController>().procCoefficient = 1f;
+            rayG.GetComponent<ProjectileDamage>().damage = 1f;
+            rayG.GetComponent<ProjectileDamage>().damageType = DamageType.Shock5s;
+
+            // register it for networking
+            if (rayG) PrefabAPI.RegisterNetworkPrefab(rayG);
 
             // add it to the projectile catalog or it won't work in multiplayer
             ProjectileCatalog.getAdditionalEntries += list =>
             {
-                list.Add(arrowProjectile);
+                list.Add(axlBullet);
+                list.Add(blastL);
+                list.Add(rayG);
             };
 
 
             // write a clean survivor description here!
-            string desc = "Example Survivor something something.<color=#CCD3E0>" + Environment.NewLine + Environment.NewLine;
-            desc = desc + "< ! > Sample text 1." + Environment.NewLine + Environment.NewLine;
-            desc = desc + "< ! > Sample text 2." + Environment.NewLine + Environment.NewLine;
-            desc = desc + "< ! > Sample Text 3." + Environment.NewLine + Environment.NewLine;
-            desc = desc + "< ! > Sample Text 4.</color>" + Environment.NewLine + Environment.NewLine;
+            string desc = "New generation reploid, Axl.<color=#CCD3E0>" + Environment.NewLine + Environment.NewLine;
+            desc = desc + "< ! > Axl Bullets is Axl's standard weapon. It's capable of rapid fire shots." + Environment.NewLine + Environment.NewLine;
+            desc = desc + "< ! > Axl is really fast has high Attack Speed and Movement Speed." + Environment.NewLine + Environment.NewLine;
+            desc = desc + "< ! > Axl's Emergency Acceleration System(DASH) is a move that temporarily speeds up the character." + Environment.NewLine + Environment.NewLine;
+            //desc = desc + "< ! > Sample Text 4.</color>" + Environment.NewLine + Environment.NewLine;
 
             // add the language tokens
             LanguageAPI.Add("AXL_NAME", "AXL");
             LanguageAPI.Add("AXL_DESCRIPTION", desc);
-            LanguageAPI.Add("AXL_SUBTITLE", "Template for Custom Survivors");
+            LanguageAPI.Add("AXL_SUBTITLE", "AXL as a survivor for Risk Of Rain 2");
 
             // add our new survivor to the game~
             SurvivorDef survivorDef = new SurvivorDef
@@ -386,12 +419,15 @@ namespace ExampleSurvivor
 
             PassiveSetup();
             PrimarySetup();
+            SecondarySetup();
+            UtilitySetup();
+            SpecialSetup();
         }
 
         void RegisterStates()
         {
             // register the entitystates for networking reasons
-            LoadoutAPI.AddSkill(typeof(ExampleSurvivorFireArrow));
+            LoadoutAPI.AddSkill(typeof(axlBullet1));
         }
 
         void PassiveSetup()
@@ -399,8 +435,8 @@ namespace ExampleSurvivor
             // set up the passive skill here if you want
             SkillLocator component = characterPrefab.GetComponent<SkillLocator>();
 
-            LanguageAPI.Add("AXL_PASSIVE_NAME", "Passive");
-            LanguageAPI.Add("AXL_PASSIVE_DESCRIPTION", "<style=cIsUtility>Doot</style> <style=cIsHealing>doot</style>.");
+            LanguageAPI.Add("AXL_PASSIVE_NAME", "AXLleration");
+            LanguageAPI.Add("AXL_PASSIVE_DESCRIPTION", "<style=cIsUtility>Axl get super fast by leveling up!</style> <style=cIsHealing>Move Speed, Attack Speed and Crit grows on level up</style>.");
 
             component.passiveSkill.enabled = true;
             component.passiveSkill.skillNameToken = "AXL_PASSIVE_NAME";
@@ -412,13 +448,13 @@ namespace ExampleSurvivor
         {
             SkillLocator component = characterPrefab.GetComponent<SkillLocator>();
 
-            LanguageAPI.Add("AXL_PRIMARY_CROSSBOW_NAME", "Crossbow");
-            LanguageAPI.Add("AXL_PRIMARY_CROSSBOW_DESCRIPTION", "Fire an arrow, dealing <style=cIsDamage>200% damage</style>.");
+            LanguageAPI.Add("AXL_PRIMARY_NAME", "AXL-Bullet");
+            LanguageAPI.Add("AXL_PRIMARY_DESCRIPTION", "Dual pistols, dealing <style=cIsDamage>80% damage</style> and <style=cIsDamage>90% damage</style>. ");
 
             // set up your primary skill def here!
 
             SkillDef mySkillDef = ScriptableObject.CreateInstance<SkillDef>();
-            mySkillDef.activationState = new SerializableEntityStateType(typeof(ExampleSurvivorFireArrow));
+            mySkillDef.activationState = new SerializableEntityStateType(typeof(axlBullet1));
             mySkillDef.activationStateMachineName = "Weapon";
             mySkillDef.baseMaxStock = 1;
             mySkillDef.baseRechargeInterval = 0f;
@@ -435,9 +471,9 @@ namespace ExampleSurvivor
             mySkillDef.shootDelay = 0f;
             mySkillDef.stockToConsume = 1;
             mySkillDef.icon = Assets.icon1;
-            mySkillDef.skillDescriptionToken = "AXL_PRIMARY_CROSSBOW_DESCRIPTION";
-            mySkillDef.skillName = "AXL_PRIMARY_CROSSBOW_NAME";
-            mySkillDef.skillNameToken = "AXL_PRIMARY_CROSSBOW_NAME";
+            mySkillDef.skillDescriptionToken = "AXL_PRIMARY_DESCRIPTION";
+            mySkillDef.skillName = "AXL_PRIMARY_NAME";
+            mySkillDef.skillNameToken = "AXL_PRIMARY_NAME";
 
             LoadoutAPI.AddSkillDef(mySkillDef);
 
@@ -447,6 +483,183 @@ namespace ExampleSurvivor
             LoadoutAPI.AddSkillFamily(newFamily);
             component.primary.SetFieldValue("_skillFamily", newFamily);
             SkillFamily skillFamily = component.primary.skillFamily;
+
+            skillFamily.variants[0] = new SkillFamily.Variant
+            {
+                skillDef = mySkillDef,
+                unlockableName = "",
+                viewableNode = new ViewablesCatalog.Node(mySkillDef.skillNameToken, false, null)
+            };
+
+
+            // add this code after defining a new skilldef if you're adding an alternate skill
+
+            /*Array.Resize(ref skillFamily.variants, skillFamily.variants.Length + 1);
+            skillFamily.variants[skillFamily.variants.Length - 1] = new SkillFamily.Variant
+            {
+                skillDef = newSkillDef,
+                unlockableName = "",
+                viewableNode = new ViewablesCatalog.Node(newSkillDef.skillNameToken, false, null)
+            };*/
+        }
+
+        void SecondarySetup()
+        {
+            SkillLocator component = characterPrefab.GetComponent<SkillLocator>();
+
+            LanguageAPI.Add("AXL_SECONDARY_NAME", "Blast Launcher");
+            LanguageAPI.Add("AXL_SECONDARY_DESCRIPTION", "This weapon launches time-activated grenades which bounce for a few seconds before detonating, dealing <style=cIsDamage>180% damage</style> and <style=cIsDamage>200% damage</style>. ");
+
+            // set up your primary skill def here!
+
+            SkillDef mySkillDef = ScriptableObject.CreateInstance<SkillDef>();
+            mySkillDef.activationState = new SerializableEntityStateType(typeof(blastLauncher));
+            mySkillDef.activationStateMachineName = "Weapon";
+            mySkillDef.baseMaxStock = 3;
+            mySkillDef.baseRechargeInterval = 5f;
+            mySkillDef.beginSkillCooldownOnSkillEnd = false;
+            mySkillDef.canceledFromSprinting = false;
+            mySkillDef.fullRestockOnAssign = true;
+            mySkillDef.interruptPriority = InterruptPriority.Any;
+            mySkillDef.isBullets = false;
+            mySkillDef.isCombatSkill = true;
+            mySkillDef.mustKeyPress = false;
+            mySkillDef.noSprint = true;
+            mySkillDef.rechargeStock = 1;
+            mySkillDef.requiredStock = 1;
+            mySkillDef.shootDelay = 0.5f;
+            mySkillDef.stockToConsume = 1;
+            mySkillDef.icon = Assets.icon2;
+            mySkillDef.skillDescriptionToken = "AXL_SECONDARY_DESCRIPTION";
+            mySkillDef.skillName = "AXL_SECONDARY_NAME";
+            mySkillDef.skillNameToken = "AXL_SECONDARY_NAME";
+
+            LoadoutAPI.AddSkillDef(mySkillDef);
+
+            component.secondary = characterPrefab.AddComponent<GenericSkill>();
+            SkillFamily newFamily = ScriptableObject.CreateInstance<SkillFamily>();
+            newFamily.variants = new SkillFamily.Variant[1];
+            LoadoutAPI.AddSkillFamily(newFamily);
+            component.secondary.SetFieldValue("_skillFamily", newFamily);
+            SkillFamily skillFamily = component.secondary.skillFamily;
+
+            skillFamily.variants[0] = new SkillFamily.Variant
+            {
+                skillDef = mySkillDef,
+                unlockableName = "",
+                viewableNode = new ViewablesCatalog.Node(mySkillDef.skillNameToken, false, null)
+            };
+
+
+            // add this code after defining a new skilldef if you're adding an alternate skill
+
+            /*Array.Resize(ref skillFamily.variants, skillFamily.variants.Length + 1);
+            skillFamily.variants[skillFamily.variants.Length - 1] = new SkillFamily.Variant
+            {
+                skillDef = newSkillDef,
+                unlockableName = "",
+                viewableNode = new ViewablesCatalog.Node(newSkillDef.skillNameToken, false, null)
+            };*/
+        }
+
+        void UtilitySetup()
+        {
+            SkillLocator component = characterPrefab.GetComponent<SkillLocator>();
+
+            LanguageAPI.Add("AXL_UTILITY_NAME", "Dash");
+            LanguageAPI.Add("AXL_UTILITY_DESCRIPTION", "<style=cIsDamage>Perform a Dash</style>.");
+
+            // set up your primary skill def here!
+
+            SkillDef mySkillDef = ScriptableObject.CreateInstance<SkillDef>();
+            mySkillDef.activationState = new SerializableEntityStateType(typeof(Dash));
+            mySkillDef.activationStateMachineName = "Weapon";
+            mySkillDef.baseMaxStock = 1;
+            mySkillDef.baseRechargeInterval = 2f;
+            mySkillDef.beginSkillCooldownOnSkillEnd = false;
+            mySkillDef.canceledFromSprinting = false;
+            mySkillDef.fullRestockOnAssign = true;
+            mySkillDef.interruptPriority = InterruptPriority.Any;
+            mySkillDef.isBullets = false;
+            mySkillDef.isCombatSkill = true;
+            mySkillDef.mustKeyPress = false;
+            mySkillDef.noSprint = true;
+            mySkillDef.rechargeStock = 1;
+            mySkillDef.requiredStock = 1;
+            mySkillDef.shootDelay = 0f;
+            mySkillDef.stockToConsume = 1;
+            mySkillDef.icon = Assets.icon3;
+            mySkillDef.skillDescriptionToken = "AXL_UTILITY_DESCRIPTION";
+            mySkillDef.skillName = "AXL_UTILITY_NAME";
+            mySkillDef.skillNameToken = "AXL_UTILITY_NAME";
+
+            LoadoutAPI.AddSkillDef(mySkillDef);
+
+            component.utility = characterPrefab.AddComponent<GenericSkill>();
+            SkillFamily newFamily = ScriptableObject.CreateInstance<SkillFamily>();
+            newFamily.variants = new SkillFamily.Variant[1];
+            LoadoutAPI.AddSkillFamily(newFamily);
+            component.utility.SetFieldValue("_skillFamily", newFamily);
+            SkillFamily skillFamily = component.utility.skillFamily;
+
+            skillFamily.variants[0] = new SkillFamily.Variant
+            {
+                skillDef = mySkillDef,
+                unlockableName = "",
+                viewableNode = new ViewablesCatalog.Node(mySkillDef.skillNameToken, false, null)
+            };
+
+
+            // add this code after defining a new skilldef if you're adding an alternate skill
+
+            /*Array.Resize(ref skillFamily.variants, skillFamily.variants.Length + 1);
+            skillFamily.variants[skillFamily.variants.Length - 1] = new SkillFamily.Variant
+            {
+                skillDef = newSkillDef,
+                unlockableName = "",
+                viewableNode = new ViewablesCatalog.Node(newSkillDef.skillNameToken, false, null)
+            };*/
+        }
+
+        void SpecialSetup()
+        {
+            SkillLocator component = characterPrefab.GetComponent<SkillLocator>();
+
+            LanguageAPI.Add("AXL_SPECIAL_NAME", "Ray Gun");
+            LanguageAPI.Add("AXL_SPECIAL_DESCRIPTION", "A rapid firing laser that can shock some enemies, dealing <style=cIsDamage>50% damage</style>, <style=cIsDamage>60% damage</style> and <style=cIsDamage>80% damage</style>. ");
+
+            // set up your primary skill def here!
+
+            SkillDef mySkillDef = ScriptableObject.CreateInstance<SkillDef>();
+            mySkillDef.activationState = new SerializableEntityStateType(typeof(rayGun));
+            mySkillDef.activationStateMachineName = "Weapon";
+            mySkillDef.baseMaxStock = 2;
+            mySkillDef.baseRechargeInterval = 4.8f;
+            mySkillDef.beginSkillCooldownOnSkillEnd = false;
+            mySkillDef.canceledFromSprinting = false;
+            mySkillDef.fullRestockOnAssign = true;
+            mySkillDef.interruptPriority = InterruptPriority.Any;
+            mySkillDef.isBullets = false;
+            mySkillDef.isCombatSkill = true;
+            mySkillDef.mustKeyPress = false;
+            mySkillDef.noSprint = true;
+            mySkillDef.rechargeStock = 1;
+            mySkillDef.requiredStock = 1;
+            mySkillDef.shootDelay = 0.2f;
+            mySkillDef.stockToConsume = 1;
+            mySkillDef.icon = Assets.icon4;
+            mySkillDef.skillDescriptionToken = "AXL_SPECIAL_DESCRIPTION";
+            mySkillDef.skillName = "AXL_SPECIAL_NAME";
+            mySkillDef.skillNameToken = "AXL_SPECIAL_NAME";
+
+            LoadoutAPI.AddSkillDef(mySkillDef);
+
+            component.special = characterPrefab.AddComponent<GenericSkill>();
+            SkillFamily newFamily = ScriptableObject.CreateInstance<SkillFamily>();
+            newFamily.variants = new SkillFamily.Variant[1];
+            LoadoutAPI.AddSkillFamily(newFamily);
+            component.special.SetFieldValue("_skillFamily", newFamily);
+            SkillFamily skillFamily = component.special.skillFamily;
 
             skillFamily.variants[0] = new SkillFamily.Variant
             {
@@ -513,17 +726,17 @@ namespace ExampleSurvivor
             }
 
             // include this if you're using a custom soundbank
-            /*using (Stream manifestResourceStream2 = Assembly.GetExecutingAssembly().GetManifestResourceStream("ExampleSurvivor.ExampleSurvivor.bnk"))
+            using (Stream manifestResourceStream2 = Assembly.GetExecutingAssembly().GetManifestResourceStream("MegamanXAXLMod.AXLSB.bnk"))
             {
                 byte[] array = new byte[manifestResourceStream2.Length];
                 manifestResourceStream2.Read(array, 0, array.Length);
                 SoundAPI.SoundBanks.Add(array);
-            }*/
+            }
 
             // and now we gather the assets
-            charPortrait = MainAssetBundle.LoadAsset<Sprite>("ExampleSurvivorBody").texture;
+            charPortrait = MainAssetBundle.LoadAsset<Sprite>("AxlIcon").texture;
 
-            iconP = MainAssetBundle.LoadAsset<Sprite>("PassiveIcon");
+            iconP = MainAssetBundle.LoadAsset<Sprite>("AxlIcon");
             icon1 = MainAssetBundle.LoadAsset<Sprite>("Skill1Icon");
             icon2 = MainAssetBundle.LoadAsset<Sprite>("Skill2Icon");
             icon3 = MainAssetBundle.LoadAsset<Sprite>("Skill3Icon");
@@ -532,17 +745,120 @@ namespace ExampleSurvivor
     }
 }
 
+public static class Sounds 
+{
+    public static readonly string axlBullet = "CallAXLBullets";
+    public static readonly string axlAttacks = "CallAXLAttack";
+    public static readonly string axlRayGun = "CallAXLRayGun";
+    public static readonly string axlDie = "CallAXLDie";
+    public static readonly string axlDash = "CallAXLDash";
+    public static readonly string axlBlastLauncher = "CallBlastLauncher";
+}
 
 
 // the entitystates namespace is used to make the skills, i'm not gonna go into detail here but it's easy to learn through trial and error
 namespace EntityStates.ExampleSurvivorStates
 {
-    public class ExampleSurvivorFireArrow : BaseSkillState
+    public class axlBullet1 : BaseSkillState
     {
-        public float damageCoefficient = 2f;
-        public float baseDuration = 0.75f;
-        public float recoil = 1f;
-        public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("Prefabs/Effects/Tracers/TracerToolbotRebar");
+        public float damageCoefficient = 0.8f;
+        public float baseDuration = 0.25f;
+        public float recoil = 0.4f;
+        public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("prefabs/effects/tracers/TracerBanditPistol");
+        //public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("Prefabs/Effects/Tracers/TracerToolbotRebar");
+        public static GameObject hitEffectPrefab = Resources.Load<GameObject>("prefabs/effects/impacteffects/Hitspark1");
+
+        private float duration;
+        private float fireDuration;
+        private bool hasFired;
+        private Animator animator;
+        private string muzzleString;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            this.duration = this.baseDuration / this.attackSpeedStat;
+            this.fireDuration = 0.25f * this.duration;
+            base.characterBody.SetAimTimer(2f);
+            this.animator = base.GetModelAnimator();
+            this.muzzleString = "Muzzle";
+            
+
+            base.PlayAnimation("Gesture, Override", "FireArrow", "FireArrow.playbackRate", this.duration);
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+        }
+
+        private void FireArrow()
+        {
+            if (!this.hasFired)
+            {
+                this.hasFired = true;
+
+                base.characterBody.AddSpreadBloom(0.75f);
+                Ray aimRay = base.GetAimRay();
+                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, this.muzzleString, false);
+
+                if (base.isAuthority)
+                {
+                    Util.PlaySound(Sounds.axlBullet, base.gameObject);
+                    //ProjectileManager.instance.FireProjectile(axlBullet1.tracerEffectPrefab, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+                    new BulletAttack
+                    {
+                        owner = base.gameObject,
+                        weapon = base.gameObject,
+                        origin = aimRay.origin,
+                        aimVector = aimRay.direction,
+                        minSpread = 0.1f,
+                        maxSpread = 0.4f,
+                        damage = damageCoefficient * this.damageStat,
+                        force = 1f,
+                        tracerEffectPrefab = axlBullet1.tracerEffectPrefab,
+                        muzzleName = muzzleString,
+                        hitEffectPrefab = axlBullet1.hitEffectPrefab,
+                        isCrit = Util.CheckRoll(this.critStat, base.characterBody.master)
+                    }.Fire();
+                }
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+
+            if (base.fixedAge >= this.fireDuration)
+            {
+                FireArrow();
+            }
+
+            if (base.fixedAge >= this.duration && base.isAuthority)
+            {
+                axlBullet2 AxlBullet2 = new axlBullet2();
+                this.outer.SetNextState(AxlBullet2);
+            }
+        }
+
+        public override InterruptPriority GetMinimumInterruptPriority()
+        {
+            return InterruptPriority.Skill;
+        }
+    }
+}
+
+
+namespace EntityStates.ExampleSurvivorStates
+{
+    public class axlBullet2 : BaseSkillState
+    {
+        public float damageCoefficient = 0.9f;
+        public float baseDuration = 0.30f;
+        public float recoil = 0.5f;
+        //public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("Prefabs/Effects/Tracers/TracerToolbotRebar");
+        public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("prefabs/effects/tracers/TracerBanditPistol");
+        public static GameObject hitEffectPrefab = Resources.Load<GameObject>("prefabs/effects/impacteffects/Hitspark1");
 
         private float duration;
         private float fireDuration;
@@ -580,7 +896,23 @@ namespace EntityStates.ExampleSurvivorStates
 
                 if (base.isAuthority)
                 {
-                    ProjectileManager.instance.FireProjectile(ExampleSurvivor.MegamanXAXLMod.arrowProjectile, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+                    Util.PlaySound(Sounds.axlBullet, base.gameObject);
+                    // ProjectileManager.instance.FireProjectile(axlBullet2.tracerEffectPrefab, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+                    new BulletAttack
+                    {
+                        owner = base.gameObject,
+                        weapon = base.gameObject,
+                        origin = aimRay.origin,
+                        aimVector = aimRay.direction,
+                        minSpread = 0.1f,
+                        maxSpread = 0.4f,
+                        damage = damageCoefficient * this.damageStat,
+                        force = 1f,
+                        tracerEffectPrefab = axlBullet2.tracerEffectPrefab,
+                        muzzleName = muzzleString,
+                        hitEffectPrefab = axlBullet2.hitEffectPrefab,
+                        isCrit = Util.CheckRoll(this.critStat, base.characterBody.master)
+                    }.Fire();
                 }
             }
         }
@@ -606,3 +938,535 @@ namespace EntityStates.ExampleSurvivorStates
         }
     }
 }
+
+namespace EntityStates.ExampleSurvivorStates
+{
+    public class blastLauncher : BaseSkillState
+    {
+        public float damageCoefficient = 1.8f;
+        public float baseDuration = 0.30f;
+        public float recoil = 0.5f;
+        //public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("Prefabs/Effects/Tracers/TracerToolbotRebar");
+        public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("prefabs/effects/tracers/TracerGolem");
+        public static GameObject hitEffectPrefab = Resources.Load<GameObject>("prefabs/effects/impacteffects/Hitspark1");
+
+        private float duration;
+        private float fireDuration;
+        private bool hasFired;
+        private Animator animator;
+        private string muzzleString;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            this.duration = this.baseDuration / this.attackSpeedStat;
+            this.fireDuration = 0.20f * this.duration;
+            base.characterBody.SetAimTimer(2f);
+            this.animator = base.GetModelAnimator();
+            this.muzzleString = "Muzzle";
+
+
+            base.PlayAnimation("Gesture, Override", "FireArrow", "FireArrow.playbackRate", this.duration);
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+        }
+
+        private void FireBL()
+        {
+            if (!this.hasFired)
+            {
+                this.hasFired = true;
+
+                base.characterBody.AddSpreadBloom(0.75f);
+                Ray aimRay = base.GetAimRay();
+                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, this.muzzleString, false);
+
+                if (base.isAuthority)
+                {
+                    Util.PlaySound(Sounds.axlAttacks, base.gameObject);
+                    Util.PlaySound(Sounds.axlBlastLauncher, base.gameObject);
+                    ProjectileManager.instance.FireProjectile(ExampleSurvivor.MegamanXAXLMod.blastL, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+                    
+                }
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+
+            if (base.fixedAge >= this.fireDuration)
+            {
+                FireBL();
+            }
+
+            if (base.fixedAge >= this.duration && base.isAuthority)
+            {
+                blastLauncher2 BL2 = new blastLauncher2();
+                this.outer.SetNextState(BL2);
+            }
+        }
+
+        public override InterruptPriority GetMinimumInterruptPriority()
+        {
+            return InterruptPriority.Skill;
+        }
+    }
+}
+
+namespace EntityStates.ExampleSurvivorStates
+{
+    public class blastLauncher2 : BaseSkillState
+    {
+        public float damageCoefficient = 2f;
+        public float baseDuration = 0.38f;
+        public float recoil = 0.5f;
+        //public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("Prefabs/Effects/Tracers/TracerToolbotRebar");
+        public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("prefabs/effects/tracers/TracerGolem");
+        public static GameObject hitEffectPrefab = Resources.Load<GameObject>("prefabs/effects/impacteffects/Hitspark1");
+
+        private float duration;
+        private float fireDuration;
+        private bool hasFired;
+        private Animator animator;
+        private string muzzleString;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            this.duration = this.baseDuration / this.attackSpeedStat;
+            this.fireDuration = 0.20f * this.duration;
+            base.characterBody.SetAimTimer(2f);
+            this.animator = base.GetModelAnimator();
+            this.muzzleString = "Muzzle";
+
+
+            base.PlayAnimation("Gesture, Override", "FireArrow", "FireArrow.playbackRate", this.duration);
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+        }
+
+        private void FireBL()
+        {
+            if (!this.hasFired)
+            {
+                this.hasFired = true;
+
+                base.characterBody.AddSpreadBloom(0.75f);
+                Ray aimRay = base.GetAimRay();
+                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, this.muzzleString, false);
+
+                if (base.isAuthority)
+                {
+                    Util.PlaySound(Sounds.axlBlastLauncher, base.gameObject);
+                    ProjectileManager.instance.FireProjectile(ExampleSurvivor.MegamanXAXLMod.blastL, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+
+                }
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+
+            if (base.fixedAge >= this.fireDuration)
+            {
+                FireBL();
+            }
+
+            if (base.fixedAge >= this.duration && base.isAuthority)
+            {
+                this.outer.SetNextStateToMain();
+            }
+        }
+
+        public override InterruptPriority GetMinimumInterruptPriority()
+        {
+            return InterruptPriority.Skill;
+        }
+    }
+}
+
+namespace EntityStates.ExampleSurvivorStates
+{
+    public class rayGun : BaseSkillState
+    {
+        public float damageCoefficient = 0.5f;
+        public float baseDuration = 0.10f;
+        public float recoil = 0.5f;
+        //public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("Prefabs/Effects/Tracers/TracerToolbotRebar");
+        public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("prefabs/effects/tracers/TracerGolem");
+        public static GameObject hitEffectPrefab = Resources.Load<GameObject>("prefabs/effects/impacteffects/Hitspark1");
+
+        private float duration;
+        private float fireDuration;
+        private bool hasFired;
+        private Animator animator;
+        private string muzzleString;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            this.duration = this.baseDuration / this.attackSpeedStat;
+            this.fireDuration = 0.20f * this.duration;
+            base.characterBody.SetAimTimer(2f);
+            this.animator = base.GetModelAnimator();
+            this.muzzleString = "Muzzle";
+
+
+            base.PlayAnimation("Gesture, Override", "FireArrow", "FireArrow.playbackRate", this.duration);
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+        }
+
+        private void FireRG()
+        {
+            if (!this.hasFired)
+            {
+                this.hasFired = true;
+
+                base.characterBody.AddSpreadBloom(0.75f);
+                Ray aimRay = base.GetAimRay();
+                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, this.muzzleString, false);
+
+                if (base.isAuthority)
+                {
+                    Util.PlaySound(Sounds.axlAttacks, base.gameObject);
+                    Util.PlaySound(Sounds.axlRayGun, base.gameObject);
+                    ProjectileManager.instance.FireProjectile(ExampleSurvivor.MegamanXAXLMod.rayG, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+
+                }
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+
+            if (base.fixedAge >= this.fireDuration)
+            {
+                FireRG();
+            }
+
+            if (base.fixedAge >= this.duration && base.isAuthority)
+            {
+                rayGun2 RG2 = new rayGun2();
+                this.outer.SetNextState(RG2);
+            }
+        }
+
+        public override InterruptPriority GetMinimumInterruptPriority()
+        {
+            return InterruptPriority.Skill;
+        }
+    }
+}
+
+namespace EntityStates.ExampleSurvivorStates
+{
+    public class rayGun2 : BaseSkillState
+    {
+        public float damageCoefficient = 0.6f;
+        public float baseDuration = 0.15f;
+        public float recoil = 0.5f;
+        //public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("Prefabs/Effects/Tracers/TracerToolbotRebar");
+        public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("prefabs/effects/tracers/TracerGolem");
+        public static GameObject hitEffectPrefab = Resources.Load<GameObject>("prefabs/effects/impacteffects/Hitspark1");
+
+        private float duration;
+        private float fireDuration;
+        private bool hasFired;
+        private Animator animator;
+        private string muzzleString;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            this.duration = this.baseDuration / this.attackSpeedStat;
+            this.fireDuration = 0.20f * this.duration;
+            base.characterBody.SetAimTimer(2f);
+            this.animator = base.GetModelAnimator();
+            this.muzzleString = "Muzzle";
+
+
+            base.PlayAnimation("Gesture, Override", "FireArrow", "FireArrow.playbackRate", this.duration);
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+        }
+
+        private void FireRG()
+        {
+            if (!this.hasFired)
+            {
+                this.hasFired = true;
+
+                base.characterBody.AddSpreadBloom(0.75f);
+                Ray aimRay = base.GetAimRay();
+                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, this.muzzleString, false);
+
+                if (base.isAuthority)
+                {
+                    Util.PlaySound(Sounds.axlRayGun, base.gameObject);
+                    ProjectileManager.instance.FireProjectile(ExampleSurvivor.MegamanXAXLMod.rayG, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+
+                }
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+
+            if (base.fixedAge >= this.fireDuration)
+            {
+                FireRG();
+            }
+
+            if (base.fixedAge >= this.duration && base.isAuthority)
+            {
+                rayGun3 RG3 = new rayGun3();
+                this.outer.SetNextState(RG3);
+            }
+        }
+
+        public override InterruptPriority GetMinimumInterruptPriority()
+        {
+            return InterruptPriority.Skill;
+        }
+    }
+}
+
+
+namespace EntityStates.ExampleSurvivorStates
+{
+    public class rayGun3 : BaseSkillState
+    {
+        public float damageCoefficient = 0.8f;
+        public float baseDuration = 0.25f;
+        public float recoil = 0.5f;
+        //public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("Prefabs/Effects/Tracers/TracerToolbotRebar");
+        public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("prefabs/effects/tracers/TracerGolem");
+        public static GameObject hitEffectPrefab = Resources.Load<GameObject>("prefabs/effects/impacteffects/Hitspark1");
+
+        private float duration;
+        private float fireDuration;
+        private bool hasFired;
+        private Animator animator;
+        private string muzzleString;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            this.duration = this.baseDuration / this.attackSpeedStat;
+            this.fireDuration = 0.20f * this.duration;
+            base.characterBody.SetAimTimer(2f);
+            this.animator = base.GetModelAnimator();
+            this.muzzleString = "Muzzle";
+
+
+            base.PlayAnimation("Gesture, Override", "FireArrow", "FireArrow.playbackRate", this.duration);
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+        }
+
+        private void FireRG()
+        {
+            if (!this.hasFired)
+            {
+                this.hasFired = true;
+
+                base.characterBody.AddSpreadBloom(0.75f);
+                Ray aimRay = base.GetAimRay();
+                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, this.muzzleString, false);
+
+                if (base.isAuthority)
+                {
+                    Util.PlaySound(Sounds.axlRayGun, base.gameObject);
+                    ProjectileManager.instance.FireProjectile(ExampleSurvivor.MegamanXAXLMod.rayG, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+
+                }
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+
+            if (base.fixedAge >= this.fireDuration)
+            {
+                FireRG();
+            }
+
+            if (base.fixedAge >= this.duration && base.isAuthority)
+            {
+                this.outer.SetNextStateToMain();
+            }
+        }
+
+        public override InterruptPriority GetMinimumInterruptPriority()
+        {
+            return InterruptPriority.Skill;
+        }
+    }
+}
+
+namespace EntityStates.ExampleSurvivorStates
+{
+    public class Dash : BaseState
+    {
+        public float baseDuration = 0.75f;
+        private float duration = 0.9f;
+        private Animator animator;
+
+
+        // Token: 0x06003E1F RID: 15903 RVA: 0x00102CA0 File Offset: 0x00100EA0
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Util.PlaySound(Sounds.axlDash, base.gameObject);
+            this.animator = base.GetModelAnimator();
+            ChildLocator component = this.animator.GetComponent<ChildLocator>();
+            if (base.isAuthority && base.inputBank && base.characterDirection)
+            {
+                this.forwardDirection = ((base.inputBank.moveVector == Vector3.zero) ? base.characterDirection.forward : base.inputBank.moveVector).normalized;
+            }
+            Vector3 rhs = base.characterDirection ? base.characterDirection.forward : this.forwardDirection;
+            Vector3 rhs2 = Vector3.Cross(Vector3.up, rhs);
+            float num = Vector3.Dot(this.forwardDirection, rhs);
+            float num2 = Vector3.Dot(this.forwardDirection, rhs2);
+            this.animator.SetFloat("forwardSpeed", num, 0.1f, Time.fixedDeltaTime);
+            this.animator.SetFloat("rightSpeed", num2, 0.1f, Time.fixedDeltaTime);
+            if (Mathf.Abs(num) > Mathf.Abs(num2))
+            {
+                base.PlayAnimation("Body", (num > 0f) ? "Dash" : "Dash", "Dodge.playbackRate", this.duration);
+            }
+            else
+            {
+                base.PlayAnimation("Body", (num2 > 0f) ? "Dash" : "Dash", "Dodge.playbackRate", this.duration);
+            }
+            if (Dash.jetEffect)
+            {
+                Transform transform = component.FindChild("LeftJet");
+                Transform transform2 = component.FindChild("RightJet");
+                if (transform)
+                {
+                    UnityEngine.Object.Instantiate<GameObject>(Dash.jetEffect, transform);
+                }
+                if (transform2)
+                {
+                    UnityEngine.Object.Instantiate<GameObject>(Dash.jetEffect, transform2);
+                }
+
+            }
+            this.RecalculateRollSpeed();
+            if (base.characterMotor && base.characterDirection)
+            {
+                base.characterMotor.velocity.y = 0f;
+                base.characterMotor.velocity = this.forwardDirection * this.rollSpeed;
+            }
+            Vector3 b = base.characterMotor ? base.characterMotor.velocity : Vector3.zero;
+            this.previousPosition = base.transform.position - b;
+        }
+
+        // Token: 0x06003E20 RID: 15904 RVA: 0x00102EFD File Offset: 0x001010FD
+        private void RecalculateRollSpeed()
+        {
+            this.rollSpeed = this.moveSpeedStat * Mathf.Lerp(this.initialSpeedCoefficient, this.finalSpeedCoefficient, base.fixedAge / this.duration);
+        }
+
+        // Token: 0x06003E21 RID: 15905 RVA: 0x00102F2C File Offset: 0x0010112C
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            this.RecalculateRollSpeed();
+            if (base.cameraTargetParams)
+            {
+                //base.cameraTargetParams.fovOverride = Mathf.Lerp(DodgeState.dodgeFOV, 60f, base.fixedAge / this.duration);
+                base.cameraTargetParams.fovOverride = -2.5f;
+            }
+            Vector3 normalized = (base.transform.position - this.previousPosition).normalized;
+            if (base.characterMotor && base.characterDirection && normalized != Vector3.zero)
+            {
+                Vector3 vector = normalized * this.rollSpeed;
+                float y = vector.y;
+                vector.y = 0f;
+                float d = Mathf.Max(Vector3.Dot(vector, this.forwardDirection), 0f);
+                vector = this.forwardDirection * d;
+                vector.y += Mathf.Max(y, 0f);
+                base.characterMotor.velocity = vector;
+            }
+            this.previousPosition = base.transform.position;
+            if (base.fixedAge >= this.duration && base.isAuthority)
+            {
+                this.outer.SetNextStateToMain();
+                return;
+            }
+        }
+
+        // Token: 0x06003E22 RID: 15906 RVA: 0x0010305D File Offset: 0x0010125D
+        public override void OnExit()
+        {
+            if (base.cameraTargetParams)
+            {
+                base.cameraTargetParams.fovOverride = -1f;
+            }
+            base.OnExit();
+        }
+
+        // Token: 0x06003E23 RID: 15907 RVA: 0x00103082 File Offset: 0x00101282
+        public override void OnSerialize(NetworkWriter writer)
+        {
+            base.OnSerialize(writer);
+            writer.Write(this.forwardDirection);
+        }
+
+        // Token: 0x06003E24 RID: 15908 RVA: 0x00103097 File Offset: 0x00101297
+        public override void OnDeserialize(NetworkReader reader)
+        {
+            base.OnDeserialize(reader);
+            this.forwardDirection = reader.ReadVector3();
+        }
+
+        // Token: 0x0400392E RID: 14638
+
+        public float initialSpeedCoefficient = 6f;
+
+        // Token: 0x0400392F RID: 14639
+
+        public float finalSpeedCoefficient = 5f;
+
+        // Token: 0x04003930 RID: 14640
+        public static string dodgeSoundString;
+
+        // Token: 0x04003931 RID: 14641
+        public static GameObject jetEffect;
+
+        // Token: 0x04003932 RID: 14642
+        public static float dodgeFOV;
+
+        // Token: 0x04003933 RID: 14643
+        private float rollSpeed = 5.8f;
+
+        // Token: 0x04003934 RID: 14644
+        private Vector3 forwardDirection;
+
+        // Token: 0x04003936 RID: 14646
+        private Vector3 previousPosition;
+    }
+}
+
