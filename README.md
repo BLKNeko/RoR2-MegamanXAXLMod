@@ -19,12 +19,13 @@ BLKNeko#8448 (i'm also in the RoR2 modding community, they helped me a lot)
 
 #KNOW ISSUES:
 - Golden Needler is not working for no reason.
-- On character select keep switching characters add a new "aparence" tab, but the game work OK.
+- FIXED - On character select keep switching characters add a new "skin" tab, but the game work OK. - THANKS TO: Dragonyck and Rob
 
 
 # Changelog
-V 1.1.1 Added FlameBurner secondary skill and some networking fix
-V 1.0.0 Posted
+V 1.3.2 Added Axl's Passive skill, added new attack animations and idle animation and fixed the skin tab bug.
+V 1.1.1 Added FlameBurner secondary skill and some networking fix.
+V 1.0.0 Posted.
 
 # Special Thanks
 - The RoR2 Modding Community
@@ -36,5 +37,12 @@ V 1.0.0 Posted
 -If you want to support me this is the link
 https://www.paypal.com/donate?hosted_button_id=JU57WD5QVUC2Y
 
+#CHECK OUT MY OTHER MODS !
+-X from Megaman X
+https://thunderstore.io/package/BLKNeko/MegamanXMod/
+-Zero from Megaman X
+https://thunderstore.io/package/BLKNeko/MegamanXZeroMod/
+
+#CREDITS
 I DOWNLOADED THIS MODEL HERE:
 https://www.models-resource.com/mobile/megamanxdive/model/38585/
