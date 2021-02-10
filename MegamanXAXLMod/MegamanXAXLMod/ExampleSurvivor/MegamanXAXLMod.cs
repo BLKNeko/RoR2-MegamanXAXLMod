@@ -14,12 +14,12 @@ using UnityEngine.Networking;
 using KinematicCharacterController;
 using System.IO;
 
-namespace ExampleSurvivor
+namespace AXLMod
 {
 
     [BepInDependency("com.bepis.r2api")]
 
-    [BepInPlugin(MODUID, "MegamanXAXLMod", "1.0.0")] // put your own name and version here
+    [BepInPlugin(MODUID, "MegamanXAXLMod", "1.3.2")] // put your own name and version here
     [R2APISubmoduleDependency(nameof(PrefabAPI), nameof(SurvivorAPI), nameof(LoadoutAPI), nameof(ItemAPI), nameof(DifficultyAPI), nameof(BuffAPI))] // need these dependencies for the mod to work properly
 
 
@@ -34,8 +34,13 @@ namespace ExampleSurvivor
         public static GameObject axlBullet; // prefab for our survivor's primary attack projectile
         public static GameObject blastL; // prefab for our survivor's BlastLauncher attack projectile
         public static GameObject rayG; // prefab for our survivor's RayGun attack projectile
+        public static GameObject FlameT; // Prefab for flameT
 
         private static readonly Color characterColor = new Color(0.10f, 0.20f, 0.44f); // color used for the survivor
+
+        public static Material commandoMat;
+
+
 
         private void Awake()
         {
@@ -44,6 +49,7 @@ namespace ExampleSurvivor
             RegisterStates(); // register our skill entitystates for networking
             RegisterCharacter(); // and finally put our new survivor in the game
             CreateDoppelganger(); // not really mandatory, but it's simple and not having an umbra is just kinda lame
+            AXLMod.Skins.RegisterSkins();
         }
 
         private static GameObject CreateModel(GameObject main)
@@ -61,7 +67,7 @@ namespace ExampleSurvivor
         internal static void CreatePrefab()
         {
             // first clone the commando prefab so we can turn that into our own survivor
-            characterPrefab = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("Prefabs/CharacterBodies/CommandoBody"), "AxlBody", true, "C:\\Users\\test\\Documents\\ror2mods\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor.cs", "CreatePrefab", 151);
+            characterPrefab = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("Prefabs/CharacterBodies/CommandoBody"), "AxlBody", true, "C:\\Users\\test\\Documents\\ror2mods\\AXLMod\\AXLMod\\AXLMod\\AXLMod.cs", "CreatePrefab", 151);
 
             characterPrefab.GetComponent<NetworkIdentity>().localPlayerAuthority = true;
 
@@ -110,9 +116,9 @@ namespace ExampleSurvivor
             bodyComponent.rootMotionInMainState = false;
             bodyComponent.mainRootSpeed = 0;
             bodyComponent.baseMaxHealth = 95;
-            bodyComponent.levelMaxHealth = 24;
-            bodyComponent.baseRegen = 0.5f;
-            bodyComponent.levelRegen = 0.3f;
+            bodyComponent.levelMaxHealth = 19;
+            bodyComponent.baseRegen = 0.3f;
+            bodyComponent.levelRegen = 0.26f;
             bodyComponent.baseMaxShield = 0;
             bodyComponent.levelMaxShield = 0;
             bodyComponent.baseMoveSpeed = 9;
@@ -120,14 +126,14 @@ namespace ExampleSurvivor
             bodyComponent.baseAcceleration = 90;
             bodyComponent.baseJumpPower = 15;
             bodyComponent.levelJumpPower = 0.30f;
-            bodyComponent.baseDamage = 15.5f;
-            bodyComponent.levelDamage = 3.5f;
-            bodyComponent.baseAttackSpeed = 1.7f;
-            bodyComponent.levelAttackSpeed = 0.3f;
+            bodyComponent.baseDamage = 14f;
+            bodyComponent.levelDamage = 2.8f;
+            bodyComponent.baseAttackSpeed = 1.5f;
+            bodyComponent.levelAttackSpeed = 0.1f;
             bodyComponent.baseCrit = 1.8f;
-            bodyComponent.levelCrit = 0.45f;
+            bodyComponent.levelCrit = 0.65f;
             bodyComponent.baseArmor = 0;
-            bodyComponent.levelArmor = 0;
+            bodyComponent.levelArmor = 0.1f;
             bodyComponent.baseJumpCount = 1;
             bodyComponent.sprintingSpeedMultiplier = 1.55f;
             bodyComponent.wasLucky = false;
@@ -196,6 +202,8 @@ namespace ExampleSurvivor
             characterModel.autoPopulateLightInfos = true;
             characterModel.invisibilityCount = 0;
             characterModel.temporaryOverlays = new List<TemporaryOverlay>();
+
+            characterModel.mainSkinnedMeshRenderer = characterModel.baseRendererInfos[0].renderer.GetComponent<SkinnedMeshRenderer>();
 
             TeamComponent teamComponent = null;
             if (characterPrefab.GetComponent<TeamComponent>() != null) teamComponent = characterPrefab.GetComponent<TeamComponent>();
@@ -317,18 +325,25 @@ namespace ExampleSurvivor
             aimAnimator.pitchGiveupRange = 30f;
             aimAnimator.yawGiveupRange = 10f;
             aimAnimator.giveupDuration = 8f;
+
+
+            //trying to add a passive
+            LoadoutAPI.AddSkill(typeof(CopyChipM));
+            EntityStateMachine stateMachine = bodyComponent.GetComponent<EntityStateMachine>();
+            stateMachine.mainStateType = new SerializableEntityStateType(typeof(CopyChipM));
+
         }
 
         private void RegisterCharacter()
         {
             // now that the body prefab's set up, clone it here to make the display prefab
-            characterDisplay = PrefabAPI.InstantiateClone(characterPrefab.GetComponent<ModelLocator>().modelBaseTransform.gameObject, "AxlDisplay", true, "C:\\Users\\test\\Documents\\ror2mods\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor.cs", "RegisterCharacter", 153);
+            characterDisplay = PrefabAPI.InstantiateClone(characterPrefab.GetComponent<ModelLocator>().modelBaseTransform.gameObject, "AxlDisplay", true, "C:\\Users\\test\\Documents\\ror2mods\\AXLMod\\AXLMod\\AXLMod\\AXLMod.cs", "RegisterCharacter", 153);
             characterDisplay.AddComponent<NetworkIdentity>();
 
             //-----------------------------------------------------------------------------------------------------------
 
             // clone rex's syringe projectile prefab here to use as our own projectile
-            axlBullet = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("prefabs/projectiles/TitanRockProjectile"), "Prefabs/Projectiles/ExampleArrowProjectile", true, "C:\\Users\\test\\Documents\\ror2mods\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor.cs", "RegisterCharacter", 155);
+            axlBullet = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("prefabs/projectiles/TitanRockProjectile"), "Prefabs/Projectiles/ExampleArrowProjectile", true, "C:\\Users\\test\\Documents\\ror2mods\\AXLMod\\AXLMod\\AXLMod\\AXLMod.cs", "RegisterCharacter", 155);
 
             // just setting the numbers to 1 as the entitystate will take care of those
             axlBullet.GetComponent<ProjectileController>().procCoefficient = 1f;
@@ -341,7 +356,7 @@ namespace ExampleSurvivor
             //-------------------------------------------------------------------------------------------------------------
 
             // clone rex's syringe projectile prefab here to use as our own projectile
-            blastL = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("prefabs/projectiles/EngiGrenadeProjectile"), "Prefabs/Projectiles/blastLProjectile", true, "C:\\Users\\test\\Documents\\ror2mods\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor.cs", "RegisterCharacter", 155);
+            blastL = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("prefabs/projectiles/EngiGrenadeProjectile"), "Prefabs/Projectiles/blastLProjectile", true, "C:\\Users\\test\\Documents\\ror2mods\\AXLMod\\AXLMod\\AXLMod\\AXLMod.cs", "RegisterCharacter", 155);
 
             // just setting the numbers to 1 as the entitystate will take care of those
             blastL.GetComponent<ProjectileController>().procCoefficient = 1f;
@@ -354,7 +369,7 @@ namespace ExampleSurvivor
             //-------------------------------------------------------------------------------------------------------------
 
             // clone rex's syringe projectile prefab here to use as our own projectile
-            rayG = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("prefabs/projectiles/Arrow"), "Prefabs/Projectiles/blastLProjectile", true, "C:\\Users\\test\\Documents\\ror2mods\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor.cs", "RegisterCharacter", 155);
+            rayG = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("prefabs/projectiles/Arrow"), "Prefabs/Projectiles/blastLProjectile", true, "C:\\Users\\test\\Documents\\ror2mods\\AXLMod\\AXLMod\\AXLMod\\AXLMod.cs", "RegisterCharacter", 155);
 
             // just setting the numbers to 1 as the entitystate will take care of those
             rayG.GetComponent<ProjectileController>().procCoefficient = 1f;
@@ -364,12 +379,26 @@ namespace ExampleSurvivor
             // register it for networking
             if (rayG) PrefabAPI.RegisterNetworkPrefab(rayG);
 
+            //-------------------------------------------------------------------------------------------------------------
+
+            // clone rex's syringe projectile prefab here to use as our own projectile
+            FlameT = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("prefabs/projectiles/MageFirewallPillarProjectile"), "Prefabs /Projectiles/FlameTProjectile", true, "C:\\Users\\test\\Documents\\ror2mods\\AXLMod\\AXLMod\\AXLMod\\AXLMod.cs", "RegisterCharacter", 155);
+
+            // just setting the numbers to 1 as the entitystate will take care of those
+            FlameT.GetComponent<ProjectileController>().procCoefficient = 1f;
+            FlameT.GetComponent<ProjectileDamage>().damage = 1f;
+            FlameT.GetComponent<ProjectileDamage>().damageType = DamageType.IgniteOnHit;
+
+            // register it for networking
+            if (FlameT) PrefabAPI.RegisterNetworkPrefab(FlameT);
+
             // add it to the projectile catalog or it won't work in multiplayer
             ProjectileCatalog.getAdditionalEntries += list =>
             {
                 list.Add(axlBullet);
                 list.Add(blastL);
                 list.Add(rayG);
+                list.Add(FlameT);
             };
 
 
@@ -428,6 +457,15 @@ namespace ExampleSurvivor
         {
             // register the entitystates for networking reasons
             LoadoutAPI.AddSkill(typeof(axlBullet1));
+            LoadoutAPI.AddSkill(typeof(axlBullet2));
+            LoadoutAPI.AddSkill(typeof(blastLauncher));
+            LoadoutAPI.AddSkill(typeof(blastLauncher2));
+            LoadoutAPI.AddSkill(typeof(rayGun));
+            LoadoutAPI.AddSkill(typeof(rayGun2));
+            LoadoutAPI.AddSkill(typeof(rayGun3));
+            LoadoutAPI.AddSkill(typeof(flameTR));
+            LoadoutAPI.AddSkill(typeof(flameTR2));
+
         }
 
         void PassiveSetup()
@@ -435,8 +473,8 @@ namespace ExampleSurvivor
             // set up the passive skill here if you want
             SkillLocator component = characterPrefab.GetComponent<SkillLocator>();
 
-            LanguageAPI.Add("AXL_PASSIVE_NAME", "AXLleration");
-            LanguageAPI.Add("AXL_PASSIVE_DESCRIPTION", "<style=cIsUtility>Axl get super fast by leveling up!</style> <style=cIsHealing>Move Speed, Attack Speed and Crit grows on level up</style>.");
+            LanguageAPI.Add("AXL_PASSIVE_NAME", "CopyChipM");
+            LanguageAPI.Add("AXL_PASSIVE_DESCRIPTION", "<style=cIsUtility>Axl's CopyChip ability has evolved !</style> <style=cIsHealing> Killing enemies has a 7% chance to spawn a ghost of the killed enemy.</style>.");
 
             component.passiveSkill.enabled = true;
             component.passiveSkill.skillNameToken = "AXL_PASSIVE_NAME";
@@ -550,16 +588,45 @@ namespace ExampleSurvivor
                 viewableNode = new ViewablesCatalog.Node(mySkillDef.skillNameToken, false, null)
             };
 
+            //New SKill Secondary Here
+
+            LanguageAPI.Add("AXL_SECONDARYV_NAME", "Flame Burner");
+            LanguageAPI.Add("AXL_SECONDARYV_DESCRIPTION", "A fearsome flamethrower that can roast foes like marshmallows or hot dogs in a fire. <style=cIsDamage>chance to stack burning efect on enemies</style>");
+
+
+            mySkillDef = ScriptableObject.CreateInstance<SkillDef>();
+            mySkillDef.activationState = new SerializableEntityStateType(typeof(flameTR));
+            mySkillDef.activationStateMachineName = "Weapon";
+            mySkillDef.baseMaxStock = 1;
+            mySkillDef.baseRechargeInterval = 8f;
+            mySkillDef.beginSkillCooldownOnSkillEnd = false;
+            mySkillDef.canceledFromSprinting = false;
+            mySkillDef.fullRestockOnAssign = true;
+            mySkillDef.interruptPriority = InterruptPriority.Any;
+            mySkillDef.isBullets = false;
+            mySkillDef.isCombatSkill = true;
+            mySkillDef.mustKeyPress = false;
+            mySkillDef.noSprint = true;
+            mySkillDef.rechargeStock = 1;
+            mySkillDef.requiredStock = 1;
+            mySkillDef.shootDelay = 0f;
+            mySkillDef.stockToConsume = 1;
+            mySkillDef.icon = Assets.icon5;
+            mySkillDef.skillDescriptionToken = "AXL_SECONDARYV_DESCRIPTION";
+            mySkillDef.skillName = "AXL_SECONDARYV_NAME";
+            mySkillDef.skillNameToken = "AXL_SECONDARYV_NAME";
+
+            LoadoutAPI.AddSkillDef(mySkillDef);
 
             // add this code after defining a new skilldef if you're adding an alternate skill
 
-            /*Array.Resize(ref skillFamily.variants, skillFamily.variants.Length + 1);
+            Array.Resize(ref skillFamily.variants, skillFamily.variants.Length + 1);
             skillFamily.variants[skillFamily.variants.Length - 1] = new SkillFamily.Variant
             {
-                skillDef = newSkillDef,
+                skillDef = mySkillDef,
                 unlockableName = "",
-                viewableNode = new ViewablesCatalog.Node(newSkillDef.skillNameToken, false, null)
-            };*/
+                viewableNode = new ViewablesCatalog.Node(mySkillDef.skillNameToken, false, null)
+            };
         }
 
         void UtilitySetup()
@@ -609,16 +676,7 @@ namespace ExampleSurvivor
                 viewableNode = new ViewablesCatalog.Node(mySkillDef.skillNameToken, false, null)
             };
 
-
-            // add this code after defining a new skilldef if you're adding an alternate skill
-
-            /*Array.Resize(ref skillFamily.variants, skillFamily.variants.Length + 1);
-            skillFamily.variants[skillFamily.variants.Length - 1] = new SkillFamily.Variant
-            {
-                skillDef = newSkillDef,
-                unlockableName = "",
-                viewableNode = new ViewablesCatalog.Node(newSkillDef.skillNameToken, false, null)
-            };*/
+            
         }
 
         void SpecialSetup()
@@ -680,12 +738,13 @@ namespace ExampleSurvivor
             };*/
         }
 
+
         private void CreateDoppelganger()
         {
             // set up the doppelganger for artifact of vengeance here
             // quite simple, gets a bit more complex if you're adding your own ai, but commando ai will do
 
-            doppelganger = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("Prefabs/CharacterMasters/CommandoMonsterMaster"), "AXLMonsterMaster", true, "C:\\Users\\test\\Documents\\ror2mods\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor\\ExampleSurvivor.cs", "CreateDoppelganger", 159);
+            doppelganger = PrefabAPI.InstantiateClone(Resources.Load<GameObject>("Prefabs/CharacterMasters/CommandoMonsterMaster"), "AXLMonsterMaster", true, "C:\\Users\\test\\Documents\\ror2mods\\AXLMod\\AXLMod\\AXLMod\\AXLMod.cs", "CreateDoppelganger", 159);
 
             MasterCatalog.getAdditionalEntries += delegate (List<GameObject> list)
             {
@@ -713,6 +772,7 @@ namespace ExampleSurvivor
         public static Sprite icon2;
         public static Sprite icon3;
         public static Sprite icon4;
+        public static Sprite icon5;
 
         public static void PopulateAssets()
         {
@@ -721,7 +781,7 @@ namespace ExampleSurvivor
                 using (var assetStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("MegamanXAXLMod.megamanxaxlmodbundle"))
                 {
                     MainAssetBundle = AssetBundle.LoadFromStream(assetStream);
-                    Provider = new AssetBundleResourcesProvider("@ExampleSurvivor", MainAssetBundle);
+                    Provider = new AssetBundleResourcesProvider("@AXLMod", MainAssetBundle);
                 }
             }
 
@@ -741,6 +801,7 @@ namespace ExampleSurvivor
             icon2 = MainAssetBundle.LoadAsset<Sprite>("Skill2Icon");
             icon3 = MainAssetBundle.LoadAsset<Sprite>("Skill3Icon");
             icon4 = MainAssetBundle.LoadAsset<Sprite>("Skill4Icon");
+            icon5 = MainAssetBundle.LoadAsset<Sprite>("Skill5Icon");
         }
     }
 }
@@ -753,10 +814,59 @@ public static class Sounds
     public static readonly string axlDie = "CallAXLDie";
     public static readonly string axlDash = "CallAXLDash";
     public static readonly string axlBlastLauncher = "CallBlastLauncher";
+    public static readonly string axlFireShot = "CallAXLFireShot";
 }
 
 
 // the entitystates namespace is used to make the skills, i'm not gonna go into detail here but it's easy to learn through trial and error
+namespace EntityStates.ExampleSurvivorStates
+{
+    public class CopyChipM : GenericCharacterMain
+    {
+        private bool CopyLvl1 = false;
+        private bool CopyLvl10 = false;
+        public float baseDuration = 1f;
+        private float duration;
+        private Animator animator;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+
+        }
+        public override void OnExit()
+        {
+            base.OnExit();
+        }
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            
+            if(!CopyLvl1 && base.characterBody.level >= 1)
+            {
+                base.characterBody.inventory.GiveItem(ItemIndex.GhostOnKill, 1);
+                CopyLvl1 = true;
+            }
+
+            if (!CopyLvl10 && base.characterBody.level >= 10)
+            {
+                base.characterBody.inventory.GiveItem(ItemIndex.GhostOnKill, 1);
+                CopyLvl10 = true;
+            }
+
+
+            return;
+
+        }
+
+        public override InterruptPriority GetMinimumInterruptPriority()
+        {
+            return InterruptPriority.Skill;
+        }
+    }
+}
+
+
+
 namespace EntityStates.ExampleSurvivorStates
 {
     public class axlBullet1 : BaseSkillState
@@ -781,10 +891,9 @@ namespace EntityStates.ExampleSurvivorStates
             this.fireDuration = 0.25f * this.duration;
             base.characterBody.SetAimTimer(2f);
             this.animator = base.GetModelAnimator();
-            this.muzzleString = "Muzzle";
             
 
-            base.PlayAnimation("Gesture, Override", "FireArrow", "FireArrow.playbackRate", this.duration);
+            base.PlayAnimation("AttackL", "AxlShootL", "attackSpeed", this.duration);
         }
 
         public override void OnExit()
@@ -800,7 +909,7 @@ namespace EntityStates.ExampleSurvivorStates
 
                 base.characterBody.AddSpreadBloom(0.75f);
                 Ray aimRay = base.GetAimRay();
-                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, this.muzzleString, false);
+                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, "ABLMuzzle", false);
 
                 if (base.isAuthority)
                 {
@@ -876,7 +985,7 @@ namespace EntityStates.ExampleSurvivorStates
             this.muzzleString = "Muzzle";
 
 
-            base.PlayAnimation("Gesture, Override", "FireArrow", "FireArrow.playbackRate", this.duration);
+            base.PlayAnimation("AttackR", "AxlShootR", "attackSpeed", this.duration);
         }
 
         public override void OnExit()
@@ -892,7 +1001,7 @@ namespace EntityStates.ExampleSurvivorStates
 
                 base.characterBody.AddSpreadBloom(0.75f);
                 Ray aimRay = base.GetAimRay();
-                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, this.muzzleString, false);
+                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, "ABRMuzzle", false);
 
                 if (base.isAuthority)
                 {
@@ -963,10 +1072,10 @@ namespace EntityStates.ExampleSurvivorStates
             this.fireDuration = 0.20f * this.duration;
             base.characterBody.SetAimTimer(2f);
             this.animator = base.GetModelAnimator();
-            this.muzzleString = "Muzzle";
 
 
-            base.PlayAnimation("Gesture, Override", "FireArrow", "FireArrow.playbackRate", this.duration);
+
+            base.PlayAnimation("AttackL", "AxlShootL", "attackSpeed", this.duration);
         }
 
         public override void OnExit()
@@ -982,13 +1091,13 @@ namespace EntityStates.ExampleSurvivorStates
 
                 base.characterBody.AddSpreadBloom(0.75f);
                 Ray aimRay = base.GetAimRay();
-                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, this.muzzleString, false);
+                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, "ABLMuzzle", false);
 
                 if (base.isAuthority)
                 {
                     Util.PlaySound(Sounds.axlAttacks, base.gameObject);
                     Util.PlaySound(Sounds.axlBlastLauncher, base.gameObject);
-                    ProjectileManager.instance.FireProjectile(ExampleSurvivor.MegamanXAXLMod.blastL, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+                    ProjectileManager.instance.FireProjectile(AXLMod.MegamanXAXLMod.blastL, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
                     
                 }
             }
@@ -1041,10 +1150,9 @@ namespace EntityStates.ExampleSurvivorStates
             this.fireDuration = 0.20f * this.duration;
             base.characterBody.SetAimTimer(2f);
             this.animator = base.GetModelAnimator();
-            this.muzzleString = "Muzzle";
 
 
-            base.PlayAnimation("Gesture, Override", "FireArrow", "FireArrow.playbackRate", this.duration);
+            base.PlayAnimation("AttackR", "AxlShootR", "attackSpeed", this.duration);
         }
 
         public override void OnExit()
@@ -1060,12 +1168,12 @@ namespace EntityStates.ExampleSurvivorStates
 
                 base.characterBody.AddSpreadBloom(0.75f);
                 Ray aimRay = base.GetAimRay();
-                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, this.muzzleString, false);
+                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, "ABRMuzzle", false);
 
                 if (base.isAuthority)
                 {
                     Util.PlaySound(Sounds.axlBlastLauncher, base.gameObject);
-                    ProjectileManager.instance.FireProjectile(ExampleSurvivor.MegamanXAXLMod.blastL, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+                    ProjectileManager.instance.FireProjectile(AXLMod.MegamanXAXLMod.blastL, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
 
                 }
             }
@@ -1117,10 +1225,9 @@ namespace EntityStates.ExampleSurvivorStates
             this.fireDuration = 0.20f * this.duration;
             base.characterBody.SetAimTimer(2f);
             this.animator = base.GetModelAnimator();
-            this.muzzleString = "Muzzle";
 
 
-            base.PlayAnimation("Gesture, Override", "FireArrow", "FireArrow.playbackRate", this.duration);
+            base.PlayAnimation("AttackL", "AxlShootL", "attackSpeed", this.duration);
         }
 
         public override void OnExit()
@@ -1136,13 +1243,14 @@ namespace EntityStates.ExampleSurvivorStates
 
                 base.characterBody.AddSpreadBloom(0.75f);
                 Ray aimRay = base.GetAimRay();
-                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, this.muzzleString, false);
+                //EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, "ABLMuzzle", false);
+                EffectManager.SimpleMuzzleFlash(Huntress.HuntressWeapon.FireArrow.effectPrefab, base.gameObject, "ABLMuzzle", false);
 
                 if (base.isAuthority)
                 {
                     Util.PlaySound(Sounds.axlAttacks, base.gameObject);
                     Util.PlaySound(Sounds.axlRayGun, base.gameObject);
-                    ProjectileManager.instance.FireProjectile(ExampleSurvivor.MegamanXAXLMod.rayG, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+                    ProjectileManager.instance.FireProjectile(AXLMod.MegamanXAXLMod.rayG, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
 
                 }
             }
@@ -1195,10 +1303,9 @@ namespace EntityStates.ExampleSurvivorStates
             this.fireDuration = 0.20f * this.duration;
             base.characterBody.SetAimTimer(2f);
             this.animator = base.GetModelAnimator();
-            this.muzzleString = "Muzzle";
 
 
-            base.PlayAnimation("Gesture, Override", "FireArrow", "FireArrow.playbackRate", this.duration);
+            base.PlayAnimation("AttackR", "AxlShootR", "attackSpeed", this.duration);
         }
 
         public override void OnExit()
@@ -1214,12 +1321,12 @@ namespace EntityStates.ExampleSurvivorStates
 
                 base.characterBody.AddSpreadBloom(0.75f);
                 Ray aimRay = base.GetAimRay();
-                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, this.muzzleString, false);
+                EffectManager.SimpleMuzzleFlash(Huntress.HuntressWeapon.FireArrow.effectPrefab, base.gameObject, "ABRMuzzle", false);
 
                 if (base.isAuthority)
                 {
                     Util.PlaySound(Sounds.axlRayGun, base.gameObject);
-                    ProjectileManager.instance.FireProjectile(ExampleSurvivor.MegamanXAXLMod.rayG, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+                    ProjectileManager.instance.FireProjectile(AXLMod.MegamanXAXLMod.rayG, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
 
                 }
             }
@@ -1273,10 +1380,9 @@ namespace EntityStates.ExampleSurvivorStates
             this.fireDuration = 0.20f * this.duration;
             base.characterBody.SetAimTimer(2f);
             this.animator = base.GetModelAnimator();
-            this.muzzleString = "Muzzle";
 
 
-            base.PlayAnimation("Gesture, Override", "FireArrow", "FireArrow.playbackRate", this.duration);
+            base.PlayAnimation("AttackL", "AxlShootL", "attackSpeed", this.duration);
         }
 
         public override void OnExit()
@@ -1292,12 +1398,12 @@ namespace EntityStates.ExampleSurvivorStates
 
                 base.characterBody.AddSpreadBloom(0.75f);
                 Ray aimRay = base.GetAimRay();
-                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, this.muzzleString, false);
+                EffectManager.SimpleMuzzleFlash(Huntress.HuntressWeapon.FireArrow.effectPrefab, base.gameObject, "ABLMuzzle", false);
 
                 if (base.isAuthority)
                 {
                     Util.PlaySound(Sounds.axlRayGun, base.gameObject);
-                    ProjectileManager.instance.FireProjectile(ExampleSurvivor.MegamanXAXLMod.rayG, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+                    ProjectileManager.instance.FireProjectile(AXLMod.MegamanXAXLMod.rayG, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
 
                 }
             }
@@ -1470,3 +1576,332 @@ namespace EntityStates.ExampleSurvivorStates
     }
 }
 
+
+namespace EntityStates.ExampleSurvivorStates
+{
+    public class flameTR : BaseSkillState
+    {
+        public float damageCoefficient = 0.9f;
+        public float baseDuration = 0.001f;
+        public float recoil = 0.5f;
+        //public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("Prefabs/Effects/Tracers/TracerToolbotRebar");
+        public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("prefabs/effects/tracers/TracerEmbers");
+        public static GameObject hitEffectPrefab = Resources.Load<GameObject>("prefabs/effects/impacteffects/Hitspark1");
+
+        private float duration;
+        private float fireDuration;
+        private bool hasFired;
+        private Animator animator;
+        private string muzzleString;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            this.duration = this.baseDuration / this.attackSpeedStat;
+            this.fireDuration = 0.25f * this.duration;
+            base.characterBody.SetAimTimer(2f);
+            this.animator = base.GetModelAnimator();
+
+
+            base.PlayAnimation("Attack", "FlameTIn", "FireArrow.playbackRate", this.duration);
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+        }
+
+        private void FireFT()
+        {
+            if (!this.hasFired)
+            {
+                this.hasFired = true;
+
+                base.characterBody.AddSpreadBloom(0.05f);
+                Ray aimRay = base.GetAimRay();
+                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, "ABRMuzzle", false);
+
+                if (base.isAuthority)
+                {
+                    Util.PlaySound(Sounds.axlAttacks, base.gameObject);
+                    Util.PlaySound(Sounds.axlFireShot, base.gameObject);
+                    // ProjectileManager.instance.FireProjectile(axlBullet2.tracerEffectPrefab, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+                    new BulletAttack
+                    {
+                        owner = base.gameObject,
+                        weapon = base.gameObject,
+                        origin = aimRay.origin,
+                        aimVector = aimRay.direction,
+                        minSpread = 0.1f,
+                        maxSpread = 0.4f,
+                        damage = damageCoefficient * this.damageStat,
+                        force = 20f,
+                        tracerEffectPrefab = flameTR.tracerEffectPrefab,
+                        muzzleName = muzzleString,
+                        hitEffectPrefab = flameTR.hitEffectPrefab,
+                        maxDistance = 30f,
+                        smartCollision = true,
+                        damageType = DamageType.IgniteOnHit,
+                        isCrit = Util.CheckRoll(this.critStat, base.characterBody.master)
+                    }.Fire();
+                }
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+
+            if (base.fixedAge >= this.fireDuration)
+            {
+                FireFT();
+            }
+
+            if (base.fixedAge >= this.duration && base.isAuthority)
+            {
+                flameTR2 FTR2 = new flameTR2();
+                this.outer.SetNextState(FTR2);
+            }
+        }
+
+        public override InterruptPriority GetMinimumInterruptPriority()
+        {
+            return InterruptPriority.Skill;
+        }
+    }
+}
+
+namespace EntityStates.ExampleSurvivorStates
+{
+    public class flameTR2 : BaseSkillState
+    {
+        public float damageCoefficient = 1f;
+        public float baseDuration = 0.9f;
+        public float recoil = 0.5f;
+        //public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("Prefabs/Effects/Tracers/TracerToolbotRebar");
+        public static GameObject tracerEffectPrefab = Resources.Load<GameObject>("prefabs/effects/tracers/TracerEmbers");
+        public static GameObject hitEffectPrefab = Resources.Load<GameObject>("prefabs/effects/impacteffects/FireballVehicleDamageEffect");
+
+        private int repeat;
+        private float duration;
+        private float fireDuration;
+        private bool hasFired;
+        private Animator animator;
+        private string muzzleString;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            this.duration = this.baseDuration / this.attackSpeedStat;
+            this.fireDuration = 0.25f * this.duration;
+            base.characterBody.SetAimTimer(2f);
+            this.animator = base.GetModelAnimator();
+
+
+            
+        }
+
+        public override void OnExit()
+        {
+            base.PlayAnimation("Attack", "FlameTOut", "FireArrow.playbackRate", this.duration);
+            base.OnExit();
+        }
+
+        private void FireFT()
+        {
+            if (!this.hasFired)
+            {
+                //this.hasFired = true;
+
+                base.characterBody.AddSpreadBloom(0.15f);
+                Ray aimRay = base.GetAimRay();
+                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, "ABRMuzzle", false);
+                EffectManager.SimpleMuzzleFlash(Commando.CommandoWeapon.FirePistol.effectPrefab, base.gameObject, "ABLMuzzle", false);
+
+                if (base.isAuthority)
+                {
+                    if (repeat == 1)
+                        Util.PlaySound(Sounds.axlFireShot, base.gameObject);
+
+                    if (repeat%10 == 0 && repeat > 10)
+                    Util.PlaySound(Sounds.axlFireShot, base.gameObject);
+
+                    // ProjectileManager.instance.FireProjectile(axlBullet2.tracerEffectPrefab, aimRay.origin, Util.QuaternionSafeLookRotation(aimRay.direction), base.gameObject, this.damageCoefficient * this.damageStat, 0f, Util.CheckRoll(this.critStat, base.characterBody.master), DamageColorIndex.Default, null, -1f);
+                    new BulletAttack
+                    {
+                        owner = base.gameObject,
+                        weapon = base.gameObject,
+                        origin = aimRay.origin,
+                        aimVector = aimRay.direction,
+                        minSpread = 0.1f,
+                        maxSpread = 0.4f,
+                        damage = ((damageCoefficient * this.damageStat)/(100 - base.characterBody.level)),
+                        force = 20f,
+                        tracerEffectPrefab = flameTR.tracerEffectPrefab,
+                        muzzleName = muzzleString,
+                        hitEffectPrefab = flameTR.hitEffectPrefab,
+                        maxDistance = 30f,
+                        smartCollision = true,
+                        damageType = (Util.CheckRoll(0.88f, base.characterBody.master) ? DamageType.IgniteOnHit : DamageType.Generic)
+                    }.Fire();
+                }
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+
+            if (base.fixedAge >= this.fireDuration)
+            {
+                FireFT();
+            }
+
+            if (base.fixedAge >= this.duration && base.isAuthority)
+            {
+                if(repeat <= 100) 
+                {
+                    repeat++;
+                    FireFT();
+                }
+                else
+                    this.outer.SetNextStateToMain();
+                //flameTR2 FTR2 = new flameTR2();
+                //this.outer.SetNextState(FTR2);
+            }
+        }
+
+        public override InterruptPriority GetMinimumInterruptPriority()
+        {
+            return InterruptPriority.Skill;
+        }
+    }
+}
+
+namespace AXLMod
+{
+    public static class Skins
+    {
+        public static SkinDef CreateSkinDef(string skinName, Sprite skinIcon, CharacterModel.RendererInfo[] rendererInfos, SkinnedMeshRenderer mainRenderer, GameObject root, string unlockName)
+        {
+            LoadoutAPI.SkinDefInfo skinDefInfo = new LoadoutAPI.SkinDefInfo
+            {
+                BaseSkins = Array.Empty<SkinDef>(),
+                GameObjectActivations = new SkinDef.GameObjectActivation[0],
+                Icon = skinIcon,
+                MeshReplacements = new SkinDef.MeshReplacement[0],
+                MinionSkinReplacements = new SkinDef.MinionSkinReplacement[0],
+                Name = skinName,
+                NameToken = skinName,
+                ProjectileGhostReplacements = new SkinDef.ProjectileGhostReplacement[0],
+                RendererInfos = rendererInfos,
+                RootObject = root,
+                UnlockableName = unlockName
+            };
+
+            SkinDef skin = LoadoutAPI.CreateNewSkinDef(skinDefInfo);
+
+            return skin;
+        }
+
+        public static SkinDef CreateSkinDef(string skinName, Sprite skinIcon, CharacterModel.RendererInfo[] rendererInfos, SkinnedMeshRenderer mainRenderer, GameObject root, string unlockName, Mesh skinMesh)
+        {
+            LoadoutAPI.SkinDefInfo skinDefInfo = new LoadoutAPI.SkinDefInfo
+            {
+                BaseSkins = Array.Empty<SkinDef>(),
+                GameObjectActivations = new SkinDef.GameObjectActivation[0],
+                Icon = skinIcon,
+                MeshReplacements = new SkinDef.MeshReplacement[]
+                {
+                    new SkinDef.MeshReplacement
+                    {
+                        renderer = mainRenderer,
+                        mesh = skinMesh
+                    }
+                },
+                MinionSkinReplacements = new SkinDef.MinionSkinReplacement[0],
+                Name = skinName,
+                NameToken = skinName,
+                ProjectileGhostReplacements = new SkinDef.ProjectileGhostReplacement[0],
+                RendererInfos = rendererInfos,
+                RootObject = root,
+                UnlockableName = unlockName
+            };
+
+            SkinDef skin = LoadoutAPI.CreateNewSkinDef(skinDefInfo);
+
+            return skin;
+        }
+
+        public static Material CreateMaterial(string materialName)
+        {
+            return CreateMaterial(materialName, 0);
+        }
+
+        public static Material CreateMaterial(string materialName, float emission)
+        {
+            return CreateMaterial(materialName, emission, Color.black);
+        }
+
+        public static Material CreateMaterial(string materialName, float emission, Color emissionColor)
+        {
+            return CreateMaterial(materialName, emission, emissionColor, 0);
+        }
+
+        public static Material CreateMaterial(string materialName, float emission, Color emissionColor, float normalStrength)
+        {
+            if (!MegamanXAXLMod.commandoMat) MegamanXAXLMod.commandoMat = Resources.Load<GameObject>("Prefabs/CharacterBodies/CommandoBody").GetComponentInChildren<CharacterModel>().baseRendererInfos[0].defaultMaterial;
+
+            Material mat = UnityEngine.Object.Instantiate<Material>(MegamanXAXLMod.commandoMat);
+            Material tempMat = Assets.MainAssetBundle.LoadAsset<Material>(materialName);
+            if (!tempMat)
+            {
+                return MegamanXAXLMod.commandoMat;
+            }
+
+            mat.name = materialName;
+            mat.SetColor("_Color", tempMat.GetColor("_Color"));
+            mat.SetTexture("_MainTex", tempMat.GetTexture("_MainTex"));
+            mat.SetColor("_EmColor", emissionColor);
+            mat.SetFloat("_EmPower", emission);
+            mat.SetTexture("_EmTex", tempMat.GetTexture("_EmissionMap"));
+            mat.SetFloat("_NormalStrength", normalStrength);
+
+            return mat;
+        }
+
+        public static void RegisterSkins()
+        {
+            GameObject bodyPrefab = MegamanXAXLMod.characterPrefab;
+
+            GameObject model = bodyPrefab.GetComponentInChildren<ModelLocator>().modelTransform.gameObject;
+            CharacterModel characterModel = model.GetComponent<CharacterModel>();
+
+            ModelSkinController skinController = model.AddComponent<ModelSkinController>();
+            ChildLocator childLocator = model.GetComponent<ChildLocator>();
+
+            SkinnedMeshRenderer mainRenderer = characterModel.mainSkinnedMeshRenderer;
+            //SkinnedMeshRenderer mainRenderer = Reflection.GetFieldValue<SkinnedMeshRenderer>(characterModel, "mainSkinnedMeshRenderer");
+
+            List<SkinDef> skinDefs = new List<SkinDef>();
+
+            #region DefaultSkin
+            CharacterModel.RendererInfo[] defaultRenderers = characterModel.baseRendererInfos;
+            SkinDef defaultSkin = CreateSkinDef("AXL_DEFAULT_SKIN", Assets.icon1, defaultRenderers, mainRenderer, model, "");
+            defaultSkin.meshReplacements = new SkinDef.MeshReplacement[]
+            {
+                new SkinDef.MeshReplacement
+                {
+                    mesh = mainRenderer.sharedMesh,
+                    renderer = defaultRenderers[0].renderer
+                }
+            };
+
+            skinDefs.Add(defaultSkin);
+            #endregion
+
+
+            skinController.skins = skinDefs.ToArray();
+        }
+    }
+}
