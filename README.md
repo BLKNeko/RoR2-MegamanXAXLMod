@@ -38,11 +38,13 @@ V 1.0.0 Posted.
 https://www.paypal.com/donate?hosted_button_id=JU57WD5QVUC2Y
 
 #CHECK OUT MY OTHER MODS !
+
 -X from Megaman X
 https://thunderstore.io/package/BLKNeko/MegamanXMod/
 -Zero from Megaman X
 https://thunderstore.io/package/BLKNeko/MegamanXZeroMod/
 
 #CREDITS
+
 I DOWNLOADED THIS MODEL HERE:
 https://www.models-resource.com/mobile/megamanxdive/model/38585/
