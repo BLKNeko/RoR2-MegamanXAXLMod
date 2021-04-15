@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Og3NWqNraFWr2vainxfD5L0re9H8e2hc8DwqrAmyYGXveH1TXqNJNn+ru+ArlXvxRKDrGCdlIo7orPvF0LOz+Q==",
+  "dgSpecHash": "Jh7u64MRAH0oP8UEMLWGcOVFmrxzgGbhC5Y81CxvKZ5++jXWp4jWoun5vDVYfkksiuhLor+NT1V2F768U6PFeQ==",
   "success": true,
-  "projectFilePath": "C:\\JOGOS\\Tools\\ROR2 ModdingTools\\MegamanXAXLMod\\RoR2-MegamanXAXLMod\\MegamanXAXLMod\\MegamanXAXLMod\\ExampleSurvivor\\MegamanXAXLMod.csproj",
+  "projectFilePath": "C:\\JOGOS\\Tools\\ROR2 ModdingTools\\MegamanXAXLMod\\MegamanXAXLMod\\MegamanXAXLMod\\ExampleSurvivor\\MegamanXAXLMod.csproj",
   "expectedPackageFiles": [
     "c:\\program files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
     "c:\\program files\\dotnet\\sdk\\NuGetFallbackFolder\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
